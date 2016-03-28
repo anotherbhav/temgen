@@ -5,7 +5,7 @@ interface {{ int1_port }}
  description {{ int1_descr }}
  switchport trunk allowed vlan 1-1024
  switchport mode trunk
- channel-group 1 mode on
+ channel-group {{ lag_group }} mode on
 !
 interface {{ int2_port }}
  description {{ int2_descr }}
