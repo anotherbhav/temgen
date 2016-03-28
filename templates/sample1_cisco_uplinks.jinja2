@@ -1,0 +1,22 @@
+! --- Sample 1 ---
+! - Cisco Uplinks to a Core Switch
+!
+interface {{ int1_port }}
+ description {{ int1_descr }}
+ switchport trunk allowed vlan 1-1024
+ switchport mode trunk
+ channel-group 1 mode on
+!
+interface {{ int2_port }}
+ description {{ int2_descr }}
+ switchport trunk allowed vlan 1-1024
+ switchport mode trunk
+ channel-group {{ lag_group }} mode on
+!
+!
+!
+interface Port-channel{{ lag_group }}
+ description {{ lag_descr }}
+ switchport trunk allowed vlan 1-1024
+ switchport mode trunk
+!

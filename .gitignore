@@ -1,0 +1,9 @@
+# Mac Files
+.DS_Store
+
+# scratch/test files
+scratch.py
+scratch.jinja2
+scratch2.jinja2
+scratch.json
+scratch2.json
