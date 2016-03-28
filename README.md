@@ -1,4 +1,6 @@
-# temgen
+# temren
+- Network Template Renderer - A CLI network [tem]plate [ren]derer takes variables (from a JSON) a template (from a JINJA2) and renders the result
+
 
 # Getting Started
 

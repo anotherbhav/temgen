@@ -1,7 +1,7 @@
 #!/usr/local/bin/python3
 
 '''
-temren - Network Template Renderer - A CLI network [tem]plate [ren]derer takes variables (from a JSON) a template (from a JINJA2) and renders the result
+temren - Network Template Renderer - A CLI network [tem]plate [ren]derer takes variables (from a JSON), a template (from a JINJA2) and renders the result
 '''
 
 import argparse
