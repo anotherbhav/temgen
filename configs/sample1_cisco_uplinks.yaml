@@ -1,0 +1,14 @@
+
+
+## Arguments and Flags
+templates:
+  - sample1_cisco_uplinks.jinja2
+
+## Template Variables
+description : Sample 1 - Cisco Uplinks
+int1_descr  : "Uplink Port #1"
+int1_port   : GigabitEthernet1/0/47
+int2_descr  : "Uplink Port #2"
+int2_port   : GigabitEthernet1/0/48
+lag_group   : 1
+lag_descr   : Uplink LAG

@@ -11,6 +11,7 @@ import os
 import ipaddress
 import logging
 import sys
+import yaml
 
 ## //TODO
 # - [ ] complete the --update argument, so that the hosts.json can get updated
@@ -129,13 +130,24 @@ def parse_cli_arguments(argument_parser):
     if args.list:
         home = os.path.expanduser("~")
         sub_dir = 'configs'
-        flist = get_file_list(search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)],file_extension='json')
-        print("\n# Configurations")
+
+        flist = get_file_list(search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)],file_extension='yaml')
+        print("\n# Configurations (yaml)")
         if len(flist) <= 0:
             print("- No Configurations Found")
         for f in flist:
             basefname, ext = os.path.splitext(f)
-            print("- " +basefname)
+            # print("- " +basefname)
+            print("- " +f)
+
+        flist = get_file_list(search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)],file_extension='json')
+        print("\n# Configurations (json)")
+        if len(flist) <= 0:
+            print("- No Configurations Found")
+        for f in flist:
+            basefname, ext = os.path.splitext(f)
+            # print("- " +basefname)
+            print("- " +f)
 
         sub_dir = 'templates'
         flist = get_file_list(search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)],file_extension='jinja2')
@@ -144,7 +156,8 @@ def parse_cli_arguments(argument_parser):
             print("- None Found")
         for f in flist:
             basefname, ext = os.path.splitext(f)
-            print("- " +basefname)
+            # print("- " +basefname)
+            print("- " +f)
 
     if args.template:
         logging.debug("attempting to locate template file from CLI args: " +args.template)
@@ -165,12 +178,7 @@ def parse_cli_arguments(argument_parser):
 def append_to_templates(template_file_names=[]):
     logging.debug('entering function: ' +'append_to_templates')
 
-    if type(template_file_names) == str:
-        logging.debug("its a single file, convert to an array of dict")
-        template_file_names = [{'template': template_file_names}]
-
-    for tf in template_file_names:
-        f = tf['template']
+    for f in template_file_names:
         logging.debug("locate this template: " +f)
 
         sub_dir = 'templates'
@@ -378,9 +386,18 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
         logging.debug("found config file at location: " +fpath)
 
         try:
-            logging.debug("load variables from json file: " +fpath)
-            with open(fpath) as data_file:
-                new_variables = json.load(data_file)
+
+            basefname, ext = os.path.splitext(fpath)
+            logging.debug("load variables from " +ext +" file: " +fpath)
+
+            new_variables = []
+            if ext == '.yaml':
+                with open(fpath) as data_file:
+                    new_variables = yaml.load(data_file)
+            elif ext == '.json':
+                with open(fpath) as data_file:
+                    new_variables = json.load(data_file)
+
             logging.info("loading variables from: " +f)
 
             # in case these are not set, search for if they should be set
@@ -391,6 +408,7 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
                     logging.debug("setting flag: " +flag +" to: " +str(new_variables[flag]))
 
             new_variables = process_variables(variable_dict=new_variables,cidr_ips=cidr_ips)
+            logging.debug(new_variables)
             logging.debug("existing variables: " +str(len(variables)) +" | new variables: " +str(len(new_variables)))
             variables.update(new_variables)
             logging.debug("merged count: " +str(len(variables)))
@@ -401,10 +419,8 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
 
             # add the config to a config stack to show where variables were loaded from
             config_queue.append(fpath)
-
-            # see if there are any templates
             try:
-                append_to_templates(new_variables['template'])
+                append_to_templates(new_variables['templates'])
             except KeyError:
                 False
 
