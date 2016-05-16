@@ -223,11 +223,27 @@ def add_netmask(value=False):
 
 
 def set_flag(flag_name='', flag_value=False):
-    logging.debug('entering function: ' +'set_flag')
+    # logging.debug('entering function: ' +'set_flag')
     if not flag_name:
         return False
     logging.debug('set flag: ' +flag_name +' to: ' +str(flag_value))
     variables[flag_name] = flag_value
+
+
+def get_flag(flag_name=''):
+    # logging.debug('entering function: ' +'get_flag' ", flag_name=" +flag_name)
+    if not flag_name:
+        return False
+
+    flag_value=False
+
+    # the resolve flag should return 'True if it has no value
+    if flag_name in variables:
+        flag_value = variables[flag_name]
+    elif(flag_name == 'resolve_flag'):
+        # resolve flag should return true if it is not set
+        flag_value = True
+    return flag_value
 
 
 def resolve_entry(key=None):
@@ -259,21 +275,6 @@ def resolve_entry(key=None):
     return val
 
 
-
-def get_flag(flag_name=''):
-    logging.debug('entering function: ' +'get_flag' ", flag_name=" +flag_name)
-    if not flag_name:
-        return False
-
-    flag_value=False
-
-    # the resolve flag should return 'True if it has no value
-    if flag_name in variables:
-        flag_value = variables[flag_name]
-    elif(flag_name == 'resolve_flag'):
-        # resolve flag should return true if it is not set
-        flag_value = True
-    return flag_value
 
 
 # Method for processing JSON variables
@@ -357,23 +358,26 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
 
     if type(json_file_names) == str:
         logging.debug("single config file")
-        json_file_names = [{'configuration' : json_file_names, 'cidr_ips' : cidr_ips}]
+        # json_file_names = [{'configuration' : json_file_names, 'cidr_ips' : cidr_ips}]
+        json_file_names = [json_file_names]
 
     logging.debug("json_file_names: " +str(json_file_names))
 
-    for jf in json_file_names:
-        f = jf['configuration']
+    for f in json_file_names:
+
+        # f = jf['configuration']
 
 
-        # in case these are not set, search for if they should be set
-        if ('resolve_flag' not in variables) and ('resolve_flag' in jf) :
-            set_flag(flag_name='resolve_flag', flag_value=jf['resolve_flag'])
 
-        try:
-            cidr_ips = jf['cidr_ips']
-            logging.debug("setting cidr_ips to " +str(cidr_ips))
-        except KeyError:
-            True
+        # # in case these are not set, search for if they should be set
+        # if ('resolve_flag' not in variables) and ('resolve_flag' in jf) :
+        #     set_flag(flag_name='resolve_flag', flag_value=jf['resolve_flag'])
+
+        # try:
+        #     cidr_ips = jf['cidr_ips']
+        #     logging.debug("setting cidr_ips to " +str(cidr_ips))
+        # except KeyError:
+        #     True
 
         logging.debug("attemping to locate config file: " +f)
         sub_dir = 'configs'
@@ -431,7 +435,7 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
 
         # this try block will only succeed if there is a nexted config
         try:
-            nested_config_file = new_variables['configuration']
+            nested_config_file = new_variables['configurations']
             logging.debug("found nested config: ")
 
             nested_cidr_ips = False
