@@ -1,5 +1,5 @@
 # temren
-- Network Template Renderer - A CLI network [tem]plate [ren]derer takes variables (from a JSON) a template (from a JINJA2) and renders the result
+- Network Template Renderer - A CLI network [tem]plate [ren]derer takes variables (from a YAML) a template (from a JINJA2) and smooshes them together and renders the result
 
 
 # Getting Started
@@ -16,4 +16,4 @@ List sample Templates
 
 Render A Template:
 
-    ./temren.py --config sample1_cisco_uplinks.json
+    ./temren.py --config sample1_cisco_uplinks.yaml

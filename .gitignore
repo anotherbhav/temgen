@@ -8,3 +8,4 @@ scratch2.jinja2
 scratch.json
 scratch2.json
 scratch.yaml
+*.txt
