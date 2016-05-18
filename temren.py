@@ -256,14 +256,24 @@ def resolve_entry(key=None):
     if len(dictionary) <= 0:
         try:
             sub_dir = 'configs'
-            fpath = locate_file(fname='resolve_dictionary', search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='json')
+            fpath = locate_file(fname='resolve_dictionary', search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='yaml')
 
             # file not found
             if not fpath:
-                return False
+                fpath = locate_file(fname='resolve_dictionary', search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='json')
+                if not fpath:
+                    return False
 
-            with open(fpath) as data_file:
-                dictionary = json.load(data_file)
+            basefname, ext = os.path.splitext(fpath)
+            if ext == '.yaml':
+                with open(fpath) as data_file:
+                    dictionary = yaml.load(data_file)
+            elif ext == '.json':
+                with open(fpath) as data_file:
+                    dictionary = json.load(data_file)
+
+            # with open(fpath) as data_file:
+            #     dictionary = json.load(data_file)
         except FileNotFoundError:
             logging.warn("dictionary (resolve entry) file not found:" +hosts_file_path)
             return False
@@ -433,7 +443,7 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
             return {}
 
 
-        # this try block will only succeed if there is a nexted config
+        # this try block will only succeed if there is a nested config
         try:
             nested_config_file = new_variables['configurations']
             logging.debug("found nested config: ")
