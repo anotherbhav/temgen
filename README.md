@@ -23,6 +23,6 @@ List sample Templates
     ./temren.py --list
 
 
-Render A Template:
+Render a Template:
 
     ./temren.py --config sample1_cisco_uplinks.yaml
