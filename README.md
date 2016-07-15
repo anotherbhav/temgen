@@ -7,8 +7,8 @@
 
 Assuming you are on OSX and have brew, you can do something like the following to meet the requirements
 
-  brew install python3
-  pip3 install pyyaml jinja2
+    brew install python3
+    pip3 install pyyaml jinja2
 
 
 # Getting Started
