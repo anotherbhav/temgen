@@ -338,6 +338,35 @@ def process_variables(variable_dict={}, cidr_ips=False):
                         logging.debug("    resolve_flag is false, do not lookup")
                         i = to_resolve
 
+
+                elif ('to_dict') in i:
+                    # this resolves some value and enters the value into a key-val dictionary
+                    # it honours resolve_flag
+                    to_dict = i['to_dict']
+                    logging.debug("    to_dict entry, need to lookup: " +to_dict)
+                    if get_flag('resolve_flag'):
+                        h = resolve_entry(key=to_dict)
+                        if h:
+                            i = h
+                        else:
+                            logging.warn("no host entry found for: " +to_dict +" leaving it as static value")
+                            i = to_dict
+                    else:
+                        logging.debug("    resolve_flag is false, do not lookup")
+                        i = to_dict
+
+                    ## Process Variables in some way
+                    if process_val_flag:
+                        if get_flag('cidr_ips_flag'):
+                            i = add_cidr(i)
+                        elif get_flag('netmask_ips_flag'):
+                            i = add_netmask(i)
+
+                    process_val_flag = False
+                    i = { to_dict : i }
+
+
+
                 ## Process Variables in some way
                 if process_val_flag:
                     if get_flag('cidr_ips_flag'):
