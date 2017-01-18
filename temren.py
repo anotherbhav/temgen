@@ -12,7 +12,7 @@ import ipaddress
 import logging
 import sys
 import yaml
-
+import dns.resolver
 ## //TODO
 # - [ ] complete the --update argument, so that the hosts.json can get updated
 # - [ ] list all available variables that need to be entered? or at least checked
@@ -33,6 +33,7 @@ variables = {}
 template_queue = []
 config_queue = []
 dictionary = {}
+config_vars = {}
 
 flags = ['cidr_ips_flag', 'resolve_flag', 'netmask_ips_flag']
 
@@ -253,16 +254,14 @@ def resolve_entry(key=None):
 
     global dictionary
 
+    val = False
     if len(dictionary) <= 0:
         try:
             sub_dir = 'configs'
             fpath = locate_file(fname='resolve_dictionary', search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='yaml')
 
-            # file not found
             if not fpath:
-                fpath = locate_file(fname='resolve_dictionary', search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='json')
-                if not fpath:
-                    return False
+                return False
 
             basefname, ext = os.path.splitext(fpath)
             if ext == '.yaml':
@@ -278,9 +277,26 @@ def resolve_entry(key=None):
             logging.warn("dictionary (resolve entry) file not found:" +hosts_file_path)
             return False
     if key in dictionary:
+        logging.debug("value found in dictionary file")
         val = dictionary[key]
-    else:
-        val = False
+        return val
+    # else:
+    #     val = False
+
+
+    # No entr was found
+    import dns.resolver
+
+    r = dns.resolver.Resolver()
+    answer = r.query('google.com')
+    print(answer[0])
+    - lookup google.com
+
+    r.nameservers = ['8.8.8.8']
+
+
+    ## DNS lookup
+
 
     return val
 
@@ -397,30 +413,14 @@ def load_variables_from_json(site='', json_file_names=False, cidr_ips=False):
 
     if type(json_file_names) == str:
         logging.debug("single config file")
-        # json_file_names = [{'configuration' : json_file_names, 'cidr_ips' : cidr_ips}]
         json_file_names = [json_file_names]
 
     logging.debug("json_file_names: " +str(json_file_names))
 
     for f in json_file_names:
-
-        # f = jf['configuration']
-
-
-
-        # # in case these are not set, search for if they should be set
-        # if ('resolve_flag' not in variables) and ('resolve_flag' in jf) :
-        #     set_flag(flag_name='resolve_flag', flag_value=jf['resolve_flag'])
-
-        # try:
-        #     cidr_ips = jf['cidr_ips']
-        #     logging.debug("setting cidr_ips to " +str(cidr_ips))
-        # except KeyError:
-        #     True
-
         logging.debug("attemping to locate config file: " +f)
         sub_dir = 'configs'
-        fpath = locate_file(fname=f, search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='json')
+        fpath = locate_file(fname=f, search_dirs=[os.path.join(script_dir,sub_dir), os.path.join(cwd_dir,sub_dir), os.path.join(home_dir,sub_dir)], file_extension='yaml')
 
         if not fpath:
             logging.warning('could not find config file: ' +f)
@@ -535,11 +535,23 @@ def output_to_file(file_name=False, file_content=False):
 
 
 
+def load_config_vars(fpath=False):
+    logging.debug('entering function: ' +'load_config_vars, fpath=' +fpath)
 
+    try:
+        with open(fpath) as data_file:
+            config_vars = yaml.load(data_file)
+            return config_vars
+    except FileNotFoundError:
+            logging.info("dictionary (resolve entry) file not found:" +fpath)
+
+    return {}
 
 # --- Script Starts Here ---
 
 # parse inputs from CLI
+config_vars = load_config_vars(fpath = os.path.join(home_dir, "config.yaml"))
+sys.exit(1)
 parse_cli_arguments(argument_parser=p)
 
 
